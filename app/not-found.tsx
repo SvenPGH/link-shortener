@@ -1,4 +1,4 @@
-import Link from 'next/link'
+// import Link from 'next/link'
 
 export default function NotFound() {
     return (
@@ -7,7 +7,7 @@ export default function NotFound() {
                 404 - Page Not Found
             </h1>
             <p style={{ fontSize: '1.2rem' }}>
-                Oops! Looks like the page you were searching for doesn't exist.
+                Oops! Looks like the page you were searching for doesn&#39;t exist.
             </p>
             <p style={{ fontSize: '1rem', color: '#555', marginBottom: '2rem' }}>
                 It might have been moved, deleted, or perhaps you mistyped the URL.
