@@ -28,7 +28,7 @@ export default function Header() {
 
     const logoDisplayHeight = 36;
     const logoDisplayWidth = Math.round(logoDisplayHeight * (18 / 9));
-    const imageSrc = darkMode ? '/svpicon_cropped_alpha-dark.png' : '/svpicon_cropped_alpha.png';
+    const imageSrc = darkMode ? '/svpicon_cropped_alpha_dark.png' : '/svpicon_cropped_alpha.png';
 
     return (
         <header className="fixed top-0 left-0 right-0 z-10 grid grid-cols-[auto_1fr_auto] items-center p-4 sm:p-6">
