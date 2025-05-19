@@ -1,5 +1,3 @@
-// import Link from 'next/link'
-
 export default function NotFound() {
     return (
         <div className={"flex flex-col gap-4 row-start-2 items-center justify-center w-full max-w-4xl mx-auto px-4 pt-20 sm:pt-24"}>
