@@ -8,8 +8,8 @@ import {AuthProvider} from "@/app/contexts/AuthContext";
 
 const jura = Jura({subsets: ['latin'], display: 'swap', variable: '--font-jura', weight: ['300', '400', '500', '600', '700']});
 export const metadata: Metadata = {
-  title: "svp.gl",
-  description: "'Link Shortener Service' - Sven Puite Go Link (svp.gl)",
+  title: "SVP.GL",
+  description: "'Link Shortener Service' - Go Link (SVP.GL)",
 };
 
 export default function RootLayout({children,}: Readonly<{ children: React.ReactNode; }>) {
