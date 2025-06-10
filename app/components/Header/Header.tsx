@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { useTheme } from "@/app/contexts/ThemeContext";
 
 import UserIcon from "@/app/components/Icons/UserIcon";
-import ChevronDownIcon from "@/app/components/Icons/ChevronDownIcon";
 
 export default function Header() {
     const router = useRouter();

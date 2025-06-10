@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children,}: Readonly<{ children: React.ReactNode; }>) {
     return (
-        <html lang="en" role={"main"}>
+        <html lang="en">
             <body className={`${jura.variable} antialiased`}>
                 <AuthProvider>
                     <ThemeProvider>
