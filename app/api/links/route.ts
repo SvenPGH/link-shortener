@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/edge";
 
 export async function POST(request: NextRequest) {
     try {
@@ -8,15 +9,15 @@ export async function POST(request: NextRequest) {
         const { originalUrl } = body;
 
         // Basic validation
-        if (!originalUrl) {
+        if(!originalUrl) {
             return NextResponse.json({ error: 'Original URL is required' }, { status: 400 });
         }
 
         // More robust URL validation
         try {
             new URL(originalUrl);
-        } catch (error) {
-            return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
+        } catch(error) {
+            return NextResponse.json({ error: `Invalid URL format - ${ error }` }, { status: 400 });
         }
 
         // TODO: Actual Linking Logic
@@ -42,9 +43,14 @@ export async function POST(request: NextRequest) {
         // Return the full link object plus the user-friendly full shortUrl
         return NextResponse.json({ ...newLink, shortUrl: shortUrl }, { status: 201 });
 
-    } catch (error) {
-        if (error instanceof Error && (error as any).code === 'P2002' && (error as any).meta?.target?.includes('shortCode')) {
-            return NextResponse.json({ error: 'Failed to create a unique short link, please try again.' }, { status: 500 });
+    } catch(error) {
+        if(error instanceof PrismaClientKnownRequestError) {
+            if(error.code === 'P2002') {
+                const target = error.meta?.target as string[];
+                if(target?.includes('shortCode')) {
+                    return NextResponse.json({error: 'Failed to create a unique short link, please try again.'}, {status: 500});
+                }
+            }
         }
 
         console.error("Error creating link:", error);
