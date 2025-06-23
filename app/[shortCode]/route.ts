@@ -10,11 +10,7 @@ export async function GET(
     const shortCode = (await params).shortCode;
     let link: Link | null = null;
 
-    if(!shortCode) {
-        console.error('No shortCode received as Parameter in Route.');
-        notFound();
-    }
-
+    if(!shortCode) notFound();
     try {
         link = await prisma.link.findUnique({
             where: { shortCode },
