@@ -5,9 +5,8 @@ import { Link } from '@prisma/client';
 
 export async function GET(
     request: NextRequest,
-    context: { params: { shortCode: string } }
+    { params }: { params: { shortCode: string } }
 ) {
-    const params = context.params;
     const shortCode = params.shortCode;
     let link: Link | null = null;
 
