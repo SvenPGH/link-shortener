@@ -162,7 +162,7 @@ export default function MyLinksPage() {
                     <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Manage your standard and custom shortened links.</p>
                 </div>
                 <div className="text-center py-10 mt-6">
-                    <p className="text-lg text-gray-500 dark:text-gray-400 mb-4">You haven't created any links yet.</p>
+                    <p className="text-lg text-gray-500 dark:text-gray-400 mb-4">You haven&apos;t created any links yet.</p>
                     <div className="mt-4 flex justify-center">
                         <CreateLinkForm onLinkCreatedAction={handleLinkCreated} />
                     </div>
