@@ -1,18 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
+import {redirect} from "next/navigation";
 
 import GithubIcon from "@/app/components/Icons/GithubIcon";
 import GoogleIcon from "@/app/components/Icons/GoogleIcon";
 import AppleIcon from "@/app/components/Icons/AppleIcon";
 
-// import { useRouter } from 'next/navigation';
-// import { signIn } from "next-auth/react";
-
 export default function LoginPage() {
     const handleOAuthSignIn = (provider: string) => {
-        console.log(`Attempting to sign in with ${provider}`);
-        alert(`TODO: Implement Sign in with ${provider}`);
+        signIn(provider).then(() => {
+            redirect('/');
+        });
     };
     const oauthButtonBaseStyle = "w-full flex items-center justify-center px-4 py-3 text-sm font-medium rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ease-in-out";
     const oauthButtonStyle = `${oauthButtonBaseStyle} bg-gray-800 dark:bg-gray-200 text-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-300 focus:ring-gray-500 dark:focus:ring-gray-400 dark:focus:ring-offset-black`;

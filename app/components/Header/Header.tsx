@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from "react";
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from "@/app/contexts/ThemeContext";
 
@@ -10,26 +11,22 @@ import UserIcon from "@/app/components/Icons/UserIcon";
 
 export default function Header() {
     const router = useRouter();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { data: session, status } = useSession();
     const { darkMode } = useTheme();
 
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
     const profileButtonRef = useRef<HTMLButtonElement>(null);
 
-    const handleLoginClick = (): void => {
-        setIsLoggedIn(true);
-        setIsPopupOpen(false);
-    }
-
     const handleProfileButtonClick = (): void => {
         setIsPopupOpen(prev => !prev);
     }
 
     const handleLogout = (): void => {
-        setIsLoggedIn(false);
-        setIsPopupOpen(false);
-        console.log("User logged out (pseudo)");
+        signOut()
+        .then(() => {
+            console.log('User logged out.');
+        });  // NextAuth Logout
         router.push('/');
     }
 
@@ -41,12 +38,7 @@ export default function Header() {
     useEffect(() => {
         if (!isPopupOpen) return;
         function handleClickOutside(event: MouseEvent) {
-            if (
-                popupRef.current &&
-                !popupRef.current.contains(event.target as Node) &&
-                profileButtonRef.current &&
-                !profileButtonRef.current.contains(event.target as Node)
-            ) {
+            if (popupRef.current && !popupRef.current.contains(event.target as Node) && profileButtonRef.current && !profileButtonRef.current.contains(event.target as Node)) {
                 setIsPopupOpen(false);
             }
         }
@@ -71,7 +63,9 @@ export default function Header() {
             </Link>
 
             <div className="col-start-3 relative">
-                {isLoggedIn ? (
+                { status === 'loading' ? (
+                    <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+                ) : session ? (
                     <button
                         ref={profileButtonRef}
                         onClick={handleProfileButtonClick}
@@ -79,11 +73,15 @@ export default function Header() {
                         aria-expanded={isPopupOpen}
                         className={`${profileButtonBaseClasses} ${profileButtonColors} ${isPopupOpen ? openPopupRingClasses : 'focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-300 focus:ring-offset-2 dark:focus:ring-offset-black'}`}
                     >
-                        <UserIcon/>
+                        { session.user?.image ? (
+                            <Image src={session.user.image} alt={session.user.name || 'User Avatar'} width={40} height={40} className="rounded-full" />
+                        ) : (
+                            <UserIcon/>
+                        )}
                     </button>
                 ) : (
                     <button
-                        onClick={handleLoginClick}
+                        onClick={() => router.push('/auth/login')}
                         aria-label="Log in"
                         className="flex items-center justify-center h-10 px-4 text-sm font-medium rounded-2xl bg-gray-800 dark:bg-gray-200 text-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-gray-400 dark:focus:ring-offset-black transition-colors duration-300 ease-in-out"
                     >
@@ -91,7 +89,7 @@ export default function Header() {
                     </button>
                 )}
 
-                {isPopupOpen && isLoggedIn && (
+                {isPopupOpen && session && (
                     <div
                         ref={popupRef}
                         className="absolute right-0 mt-2 w-56 origin-top-right bg-white dark:bg-gray-900 rounded-2xl shadow-lg focus:outline-none z-40 transition-colors duration-300 ease-in-out"

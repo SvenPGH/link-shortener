@@ -1,9 +1,12 @@
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from 'next/server';
 import { nanoid } from 'nanoid';
 import { prisma } from '@/lib/prisma';
-import {PrismaClientKnownRequestError} from "@prisma/client/runtime/edge";
+import { auth } from '@/auth';
 
 export async function POST(request: NextRequest) {
+    const session = await auth();
+
     try {
         const body = await request.json();
         const { originalUrl } = body;
@@ -23,14 +26,11 @@ export async function POST(request: NextRequest) {
         // TODO: Actual Linking Logic
         const shortCode = nanoid(7);
 
-        // --- Logic for anonymous vs. registered users from our previous discussions would go here ---
-        // For example, setting an 'expiresAt' for anonymous links:
         const linkData = {
             originalUrl: originalUrl,
             shortCode: shortCode,
-            // TODO: after user implementation
-            // userId: session?.user?.id, // If session exists
-            // expiresAt: !session ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null // Expires in 30 days if no user
+            userId: session?.user?.id,
+            expiresAt: !session ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null // Expires in 30 days if no user
         };
 
         const newLink = await prisma.link.create({
@@ -39,12 +39,10 @@ export async function POST(request: NextRequest) {
 
         const base = process.env.NEXT_PUBLIC_BASE_URL || request.nextUrl.origin;
         const shortUrl = `${ base }/${ newLink.shortCode }`;
-
-        // Return the full link object plus the user-friendly full shortUrl
         return NextResponse.json({ ...newLink, shortUrl: shortUrl }, { status: 201 });
 
     } catch(error) {
-        if(error instanceof PrismaClientKnownRequestError) {
+        if(error instanceof Prisma.PrismaClientKnownRequestError) {
             if(error.code === 'P2002') {
                 const target = error.meta?.target as string[];
                 if(target?.includes('shortCode')) {
