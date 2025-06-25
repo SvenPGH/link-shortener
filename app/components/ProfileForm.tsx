@@ -33,7 +33,6 @@ export default function ProfileForm({ user }: { user: User }) {
 
             if (response.ok) {
                 setSuccess('Profile updated successfully!');
-                // We can optionally update the user prop if passed down via state
             } else {
                 const data = await response.json();
                 setError(data.error || 'Failed to update profile.');

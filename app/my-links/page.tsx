@@ -7,13 +7,11 @@ import { useSession } from 'next-auth/react';
 
 import CreateLinkForm from '@/app/components/CreateLinkForm';
 import PremiumIcon from "@/app/components/Icons/PremiumIcon";
+import StatsIcon from '@/app/components/Icons/StatsIcon';
+import DeleteIcon from '@/app/components/Icons/DeleteIcon';
+import CopyIcon from "@/app/components/Icons/CopyIcon";
 
-const CopyIcon = () => <span title="Copy">📄</span>;
-const EditIcon = () => <span title="Edit">✏️</span>;
-const DeleteIcon = () => <span title="Delete">🗑️</span>;
-const StatsIcon = () => <span title="Stats">📊</span>;
-
-interface ShortLink {
+export interface ShortLink {
     id: string;
     originalUrl: string;
     shortCode: string;
@@ -23,15 +21,12 @@ interface ShortLink {
 }
 type TabType = 'custom' | 'standard';
 
-const LinkTable = ({ links }: { links: ShortLink[] }) => {
+const LinkTable = ({ links, onDelete }: { links: ShortLink[], onDelete: (linkId: string) => void }) => {
     const handleCopy = (shortCode: string) => {
         const url = `${window.location.origin}/${shortCode}`;
         navigator.clipboard.writeText(url);
         alert('Copied to clipboard!');
     };
-    const handleDelete = (linkId: string) => { /* TODO: Implement API call to delete */ console.log('Delete:', linkId); };
-    const handleEdit = (linkId: string) => { /* TODO: Implement edit functionality */ console.log('Edit:', linkId); };
-    const handleViewStats = (linkId: string) => { /* TODO: Implement stats view */ console.log('Stats:', linkId); };
 
     return (
         <div className="mt-6 shadow-md rounded-lg overflow-x-auto">
@@ -65,10 +60,17 @@ const LinkTable = ({ links }: { links: ShortLink[] }) => {
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(link.createdAt).toLocaleDateString()}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{link.clicks}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm font-medium space-x-1 sm:space-x-2">
-                            <button onClick={() => handleCopy(link.shortCode)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200 p-1"><CopyIcon /></button>
-                            <button onClick={() => handleEdit(link.id)} className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-200 p-1"><EditIcon /></button>
-                            <button onClick={() => handleViewStats(link.id)} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-200 p-1"><StatsIcon /></button>
-                            <button onClick={() => handleDelete(link.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200 p-1"><DeleteIcon /></button>
+                            <div className="flex items-center space-x-1 sm:space-x-2">
+                                <button title="Copy link" onClick={() => handleCopy(link.shortCode)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200 p-1">
+                                    <CopyIcon className="w-5 h-5" />
+                                </button>
+                                <Link title="View stats" href={`/my-links/${link.id}/stats`} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-200 p-1">
+                                    <StatsIcon className="w-5 h-5" />
+                                </Link>
+                                <button title="Delete link" onClick={() => onDelete(link.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200 p-1">
+                                    <DeleteIcon className="w-5 h-5" />
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 ))}
@@ -106,28 +108,33 @@ export default function MyLinksPage() {
         }
     }, [status]);
 
+    const handleDelete = async (linkId: string) => {
+        if (window.confirm('Are you sure you want to delete this link permanently?')) {
+            const response = await fetch(`/api/user/links/${linkId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                setAllLinks(prevLinks => prevLinks.filter(link => link.id !== linkId));
+            } else {
+                const data = await response.json();
+                alert(`Failed to delete link: ${data.error || 'Unknown error'}`);
+            }
+        }
+    };
+
     const handleLinkCreated = (newLink: ShortLink) => {
         setAllLinks(prevLinks => [newLink, ...prevLinks]);
     };
 
     const customLinks = useMemo(() => allLinks.filter(link => link.isCustom), [allLinks]);
     const standardLinks = useMemo(() => allLinks.filter(link => !link.isCustom), [allLinks]);
-
     const renderLinksContent = () => {
         const linksToShow = activeTab === 'custom' ? customLinks : standardLinks;
         if (linksToShow.length === 0) {
-            const isCustom = activeTab === 'custom';
-            return (
-                <div className="mt-6 py-10 text-center">
-                    <p className="text-gray-500 dark:text-gray-400">
-                        You have no {isCustom ? 'custom' : 'standard'} links in this category yet.
-                        {isCustom && " Consider upgrading or creating one!"}
-                    </p>
-                </div>
-            );
+            return <div className="mt-6 py-10 text-center"><p>You have no links in this category yet.</p></div>;
         }
-
-        return <LinkTable links={linksToShow} />;
+        return <LinkTable links={linksToShow} onDelete={handleDelete} />;
     };
 
     const getTabClassName = (tabName: TabType) => {

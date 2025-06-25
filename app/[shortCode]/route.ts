@@ -25,10 +25,25 @@ export async function GET(
     }
 
     if(link) {
-        prisma.link.update({
-            where: { id: link.id },
-            data: { clicks: { increment: 1 }, lastClickedAt: new Date() },
-        }).catch(err => {
+        Promise.all([
+            prisma.link.update({
+                where: { id: link.id },
+                data: {
+                    clicks: { increment: 1 },
+                    lastClickedAt: new Date()
+                },
+            }),
+            prisma.click.create({
+                data: {
+                    linkId: link.id,
+                    userAgent: request.headers.get('user-agent'),
+                    referrer:  request.headers.get('referer'),
+                    country:   request.headers.get('x-vercel-ip-country'),
+                    city:      request.headers.get('x-vercel-ip-city'),
+                    region:    request.headers.get('x-vercel-ip-region')
+                },
+            }),
+        ]).catch(err => {
             console.error(`Failed to update analytics for shortCode ${shortCode}:`, err);
         });
 

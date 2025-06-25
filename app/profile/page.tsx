@@ -79,7 +79,7 @@ export default function ProfilePage() {
                 body: JSON.stringify(formData),
             });
             if (response.ok) {
-                setSuccess('Profile updated successfully! Refreshing session...');
+                setSuccess('Profile updated successfully!');
                 await update({ name: formData.name });
             } else {
                 const data = await response.json();
