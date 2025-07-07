@@ -1,11 +1,11 @@
 import NextAuth from 'next-auth';
-import type { NextAuthConfig, Session } from 'next-auth'
+import type { NextAuthConfig } from 'next-auth'
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
 import Google from 'next-auth/providers/google';
 
-export const authConfig: NextAuthConfig = {
+export const { handlers, signIn, signOut, auth } = NextAuth({
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
     providers: [
@@ -50,9 +50,4 @@ export const authConfig: NextAuthConfig = {
             return token;
         }
     }
-};
-
-export const { handlers, signIn, signOut, auth } = NextAuth(authConfig)
-export const getCurrentSession: Session = async(): Promise<Session | null> => {
-    return auth();
-}
+});
