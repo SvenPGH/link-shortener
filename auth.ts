@@ -53,6 +53,6 @@ export const authConfig: NextAuthConfig = {
 };
 
 export const { handlers, signIn, signOut, auth } = NextAuth(authConfig)
-export const getCurrentSession = async(): Promise<Session | null> => {
+export const getCurrentSession: Session = async(): Promise<Session | null> => {
     return auth();
 }
