@@ -32,7 +32,7 @@ const validatePreferences = (body: any) => {
 };
 
 export async function PUT(request: NextRequest) {
-    const session = await auth();
+    const session: Session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

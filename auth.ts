@@ -1,10 +1,11 @@
 import NextAuth from 'next-auth';
+import type { NextAuthConfig } from 'next-auth'
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
 import Google from 'next-auth/providers/google';
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const authConfig: NextAuthConfig = {
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
     providers: [
@@ -12,7 +13,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         }),
-        // Add other providers here
+        /**
+         * TODO: Add Apple | Github Auth here as well
+         */
     ],
     callbacks: {
         async session({ session, token }) {
@@ -47,4 +50,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return token;
         }
     }
-});
+};
+
+export const { handlers, signIn, signOut, auth } = NextAuth(authConfig)
