@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { getCurrentSession } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
 /**
@@ -32,7 +32,7 @@ const validatePreferences = (body: any) => {
 };
 
 export async function PUT(request: NextRequest) {
-    const session: Session = await auth();
+    const session = await getCurrentSession();
     if (!session?.user?.id) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

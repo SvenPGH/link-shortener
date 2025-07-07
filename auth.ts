@@ -1,5 +1,5 @@
 import NextAuth from 'next-auth';
-import type { NextAuthConfig } from 'next-auth'
+import type { NextAuthConfig, Session } from 'next-auth'
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
@@ -53,3 +53,6 @@ export const authConfig: NextAuthConfig = {
 };
 
 export const { handlers, signIn, signOut, auth } = NextAuth(authConfig)
+export const getCurrentSession = async(): Promise<Session | null> => {
+    return auth();
+}
