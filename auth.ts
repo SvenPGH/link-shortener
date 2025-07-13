@@ -1,60 +1,54 @@
-import NextAuth from 'next-auth';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { prisma } from '@/lib/prisma';
+import Google from 'next-auth/providers/google';
+import NextAuth from 'next-auth/next';
 import { authConfig } from './auth.config';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
-import GitHubProvider from 'next-auth/providers/github';
-// Add other providers as needed
 
-export const {
-  auth,
-  signIn,
-  signOut,
-  handlers: { GET, POST },
-} = NextAuth({
+export const { auth, handlers, signIn, signOut } = NextAuth(authConfig);
   ...authConfig,
+  adapter: PrismaAdapter(prisma),
+  session: { strategy: "jwt" },
   providers: [
-    // Example providers - customize based on your needs
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
-    }),
-    CredentialsProvider({
-      name: 'credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        // Add your authentication logic here
-        // This is just an example - replace with your actual auth logic
-        if (credentials?.email === 'user@example.com' && credentials?.password === 'password') {
-          return {
-            id: '1',
-            email: 'user@example.com',
-            name: 'User',
-          };
-        }
-        return null;
-      },
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
   callbacks: {
+    // It's important to merge the callbacks, keeping the `authorized` callback from the config
     ...authConfig.callbacks,
-    async jwt({ token, user }) {
+
+    // These callbacks use the database and will only run on the server (Node.js runtime)
+    async jwt({ token, user, trigger }) {
       if (user) {
-        token.id = user.id;
+        const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+        if (dbUser) {
+          token.sub = dbUser.id;
+          token.darkMode = dbUser.darkMode;
+          token.emailNotifications = dbUser.emailNotifications;
+          token.linkAnalytics = dbUser.linkAnalytics;
+        }
+      }
+      if (trigger === "update" && token.sub) {
+        const dbUser = await prisma.user.findUnique({ where: { id: token.sub as string } });
+        if (dbUser) {
+          token.name = dbUser.name;
+          token.darkMode = dbUser.darkMode;
+          token.emailNotifications = dbUser.emailNotifications;
+          token.linkAnalytics = dbUser.linkAnalytics;
+        }
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string;
+      const customToken = token as any;
+      if (customToken.sub && session.user) {
+        session.user.id = customToken.sub;
+        session.user.darkMode = customToken.darkMode;
+        session.user.emailNotifications = customToken.emailNotifications;
+        session.user.linkAnalytics = customToken.linkAnalytics;
       }
       return session;
     },
-  },
+  }
 });
