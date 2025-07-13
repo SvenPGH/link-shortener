@@ -1,5 +1,9 @@
-export { auth as middleware } from './auth';
+import NextAuth from 'next-auth';
+import { authConfig } from './auth.config';
+
+export default NextAuth(authConfig).auth;
 
 export const config = {
-    matcher: ['/my-links/:path*', '/profile/:path*'],
+  // Matcher to specify which routes the middleware should protect.
+  matcher: ['/my-links/:path*', '/profile/:path*'],
 };
