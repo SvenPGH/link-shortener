@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import UserIcon from "@/app/components/Icons/UserIcon";
-import PremiumIcon from "@/app/components/Icons/PremiumIcon";
+// import PremiumIcon from "@/app/components/Icons/PremiumIcon";
 import Image from 'next/image';
 
 // The ProfileSection component is kept as requested for the layout.
@@ -31,7 +31,7 @@ const Spinner = () => (
 );
 
 // Mock data for features that are not yet implemented, to preserve the UI
-const mockSubscription = { isPremium: false };
+// const mockSubscription = { isPremium: false };
 
 export default function ProfilePage() {
     const { data: session, status, update } = useSession();
@@ -42,7 +42,7 @@ export default function ProfilePage() {
     const [success, setSuccess] = useState('');
 
     // State for mock features
-    const [subscription, setSubscription] = useState(mockSubscription);
+    // const [subscription, setSubscription] = useState(mockSubscription);
     const [preferences, setPreferences] = useState({
         darkMode: false, emailNotifications: false, linkAnalytics: false,
     });
@@ -120,7 +120,7 @@ export default function ProfilePage() {
     };
 
     // Mock handlers for future features
-    const handleSubscriptionToggle = () => setSubscription(prev => ({ ...prev, isPremium: !prev.isPremium }));
+    // const handleSubscriptionToggle = () => setSubscription(prev => ({ ...prev, isPremium: !prev.isPremium }));
     const handleRemoveAccount = () => {
         if(window.confirm("Are you sure you want to remove your account? This action cannot be undone.")) {
             alert("Account removal would be processed here (mock)");
