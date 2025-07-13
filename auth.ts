@@ -1,11 +1,10 @@
 import NextAuth from 'next-auth';
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
-import type { JWT } from 'next-auth/jwt';
-
 import Google from 'next-auth/providers/google';
+import type { NextAuthConfig } from 'next-auth';
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const config = {
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
     providers: [
@@ -13,19 +12,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         }),
-        /**
-         * TODO: Add Apple | Github Auth here as well
-         */
+        // Add other providers here
     ],
     callbacks: {
         async session({ session, token }) {
-            const customToken = token as JWT & {
-                darkMode: boolean;
-                emailNotifications: boolean;
-                linkAnalytics: boolean;
-            };
+            const customToken = token as any; // Cast to access custom properties
 
-            if(customToken.sub && session.user) {
+            if (customToken.sub && session.user) {
                 session.user.id = customToken.sub;
                 session.user.darkMode = customToken.darkMode;
                 session.user.emailNotifications = customToken.emailNotifications;
@@ -34,8 +27,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return session;
         },
         async jwt({ token, user, trigger }) {
-            if(user) {
-                const dbUser = await prisma.user.findUnique({ where: { id: user.id } })
+            if (user) {
+                const dbUser = await prisma.user.findUnique({ where: { id: user.id }});
                 if(dbUser) {
                     token.sub = dbUser.id;
                     token.darkMode = dbUser.darkMode;
@@ -44,16 +37,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
             }
 
-            if(trigger === 'update' && token.sub) {
-                const dbUser = await prisma.user.findUnique({ where: { id: token.sub } });
-                if(dbUser) {
-                    token.name = dbUser.name;
-                    token.darkMode = dbUser.darkMode;
-                    token.emailNotifications = dbUser.emailNotifications;
-                    token.linkAnalytics = dbUser.linkAnalytics;
+            if (trigger === "update" && token.sub) {
+                const dbUser = await prisma.user.findUnique({ where: { id: token.sub as string } });
+                if (dbUser) {
+                   token.name = dbUser.name;
+                   token.darkMode = dbUser.darkMode;
+                   token.emailNotifications = dbUser.emailNotifications;
+                   token.linkAnalytics = dbUser.linkAnalytics;
                 }
             }
+
             return token;
         }
     }
-});
+} satisfies NextAuthConfig;
+export const { handlers, signIn, signOut, auth } = NextAuth(config);
