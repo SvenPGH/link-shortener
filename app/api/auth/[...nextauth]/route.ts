@@ -1,9 +1,7 @@
-// app/api/auth/[...nextauth]/route.ts
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
 import { prisma } from '@/lib/prisma'
 
-// Force Node.js runtime for this route
 export const runtime = 'nodejs'
 
 const handler = NextAuth({
