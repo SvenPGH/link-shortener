@@ -23,9 +23,6 @@ const ProfileSection = ({ title, children, className }: { title: string, childre
     );
 };
 
-const SkeletonLoader = ({ className }: { className?: string }) => (
-    <div className={`animate-pulse bg-gray-300 dark:bg-neutral-700 rounded-md ${className}`} />
-);
 const Spinner = () => (
     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 dark:border-gray-100"></div>
 );
