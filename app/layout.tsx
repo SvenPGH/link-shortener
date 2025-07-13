@@ -1,22 +1,24 @@
 import type { Metadata } from 'next';
-import { Jura } from 'next/font/google';
+
 import '@/app/globals.css';
 import Header from '@/app/components/Header/Header';
 import Footer from '@/app/components/Footer/Footer';
+import Providers from "@/app/providers";
+
+import { Jura } from 'next/font/google';
 import {ThemeProvider} from "@/app/contexts/ThemeContext";
-import {AuthProvider} from "@/app/contexts/AuthContext";
 
 const jura = Jura({subsets: ['latin'], display: 'swap', variable: '--font-jura', weight: ['300', '400', '500', '600', '700']});
 export const metadata: Metadata = {
-  title: "svp.gl",
-  description: "'Link Shortener Service' - Sven Puite Go Link (svp.gl)",
+  title: "SVP.GL",
+  description: "'Link Shortener Service' - Go Link (SVP.GL)",
 };
 
 export default function RootLayout({children,}: Readonly<{ children: React.ReactNode; }>) {
     return (
         <html lang="en">
             <body className={`${jura.variable} antialiased`}>
-                <AuthProvider>
+                <Providers>
                     <ThemeProvider>
                         <div className="grid grid-rows-[auto_1fr_auto] items-center min-h-screen bg-white dark:bg-black text-black dark:text-white font-[family-name:var(--font-jura)] transition-colors duration-500 ease-in-out">
                             <Header/>
@@ -26,7 +28,7 @@ export default function RootLayout({children,}: Readonly<{ children: React.React
                             <Footer/>
                         </div>
                     </ThemeProvider>
-                </AuthProvider>
+                </Providers>
             </body>
         </html>
     );
