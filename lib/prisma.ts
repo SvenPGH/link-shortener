@@ -6,8 +6,9 @@ declare global {
     var prisma: PrismaClient | undefined
 }
 
-const neon = new Pool({connectionString: process.env.DATABASE_URL})
-const adapter = new PrismaNeon(neon)
+const adapter = new PrismaNeon({
+    connectionString: process.env.DATABASE_URL
+})
 
 export const prisma =
     globalThis.prisma ||
