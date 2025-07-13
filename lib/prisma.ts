@@ -1,4 +1,3 @@
-// @ts-ignore
 import {PrismaClient} from '@prisma/client'
 import {PrismaNeon} from '@prisma/adapter-neon'
 import {Pool} from '@neondatabase/serverless'
@@ -8,7 +7,6 @@ declare global {
 }
 
 const neon = new Pool({connectionString: process.env.DATABASE_URL})
-// @ts-ignore
 const adapter = new PrismaNeon(neon)
 
 export const prisma =
