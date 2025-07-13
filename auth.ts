@@ -16,7 +16,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     ...authConfig.callbacks, // Import the authorized callback
-
     // These JWT/Session callbacks use the database and only run on the server
     async jwt({ token, user, trigger }) {
       if (user) {
