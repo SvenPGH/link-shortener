@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth';
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
+import type { JWT } from 'next-auth/jwt';
 
 import Google from 'next-auth/providers/google';
 
@@ -18,11 +19,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     ],
     callbacks: {
         async session({ session, token }) {
-            if(token.sub && session.user) {
-                session.user.id = token.sub;
-                session.user.darkMode = token.darkMode;
-                session.user.emailNotifications = token.emailNotifications;
-                session.user.linkAnalytics = token.linkAnalytics;
+            const customToken = token as JWT & {
+                darkMode: boolean;
+                emailNotifications: boolean;
+                linkAnalytics: boolean;
+            };
+
+            if(customToken.sub && session.user) {
+                session.user.id = customToken.sub;
+                session.user.darkMode = customToken.darkMode;
+                session.user.emailNotifications = customToken.emailNotifications;
+                session.user.linkAnalytics = customToken.linkAnalytics;
             }
             return session;
         },
