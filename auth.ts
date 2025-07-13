@@ -1,28 +1,21 @@
 import NextAuth from 'next-auth';
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/lib/prisma";
-import { authConfig } from './auth.config';
+import {PrismaAdapter} from "@auth/prisma-adapter";
+import {prisma} from "@/lib/prisma";
+import {authConfig} from './auth.config';
 
 export const {handlers, signIn, signOut, auth,} = NextAuth({
-    ...authConfig,
     adapter: PrismaAdapter(prisma),
-    session: { strategy: "jwt" },
+    session: {strategy: "jwt"},
+    ...authConfig,
     callbacks: {
         ...authConfig.callbacks,
-        async jwt({ token, user, trigger }) {
-            if (user) {
-                const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+
+        // Server-only JWT and session callbacks
+        async jwt({token, user}) {
+            if (user?.id) {
+                const dbUser = await prisma.user.findUnique({where: {id: user.id}});
                 if (dbUser) {
-                    token.sub = dbUser.id;
-                    token.darkMode = dbUser.darkMode;
-                    token.emailNotifications = dbUser.emailNotifications;
-                    token.linkAnalytics = dbUser.linkAnalytics;
-                }
-            }
-            if (trigger === "update" && token.sub) {
-                const dbUser = await prisma.user.findUnique({ where: { id: token.sub as string } });
-                if (dbUser) {
-                    token.name = dbUser.name;
+                    token.id = dbUser.id;
                     token.darkMode = dbUser.darkMode;
                     token.emailNotifications = dbUser.emailNotifications;
                     token.linkAnalytics = dbUser.linkAnalytics;
@@ -30,13 +23,12 @@ export const {handlers, signIn, signOut, auth,} = NextAuth({
             }
             return token;
         },
-        async session({ session, token }) {
-            const customToken = token as any;
-            if (customToken.sub && session.user) {
-                session.user.id = customToken.sub;
-                session.user.darkMode = customToken.darkMode;
-                session.user.emailNotifications = customToken.emailNotifications;
-                session.user.linkAnalytics = customToken.linkAnalytics;
+        async session({session, token}) {
+            if (token.id && session.user) {
+                session.user.id = token.id as string;
+                session.user.darkMode = token.darkMode as boolean;
+                session.user.emailNotifications = token.emailNotifications as boolean;
+                session.user.linkAnalytics = token.linkAnalytics as boolean;
             }
             return session;
         },
