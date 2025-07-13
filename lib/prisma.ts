@@ -1,19 +1,22 @@
-import {PrismaClient} from '@prisma/client';
-import {PrismaNeon} from '@prisma/adapter-neon';
-import {Pool} from '@neondatabase/serverless';
-
-const prismaClientSingleton = () => {
-    const neon = new Pool({connectionString: process.env.SVP_GL_DATABASE_URL});
-    const adapter = new PrismaNeon(neon);
-    return new PrismaClient({adapter});
-};
+// @ts-ignore
+import {PrismaClient} from '@prisma/client'
+import {PrismaNeon} from '@prisma/adapter-neon'
+import {Pool} from '@neondatabase/serverless'
 
 declare global {
-    var prisma: undefined | ReturnType<typeof prismaClientSingleton>;
+    var prisma: PrismaClient | undefined
 }
 
-export const prisma = globalThis.prisma ?? prismaClientSingleton();
+const neon = new Pool({connectionString: process.env.DATABASE_URL})
+// @ts-ignore
+const adapter = new PrismaNeon(neon)
+
+export const prisma =
+    globalThis.prisma ||
+    new PrismaClient({
+        adapter,
+    })
 
 if (process.env.NODE_ENV !== 'production') {
-    globalThis.prisma = prisma;
+    globalThis.prisma = prisma
 }
