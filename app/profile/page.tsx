@@ -127,6 +127,15 @@ export default function ProfilePage() {
         }
     };
 
+    if (status === 'loading') {
+        return (
+            <div className="w-full px-4 sm:px-6 lg:px-8 py-8 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
+                <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">Loading your profile...</p>
+            </div>
+        );
+    }
+
     if (status === 'unauthenticated' || !session) {
         return (
             <div className="w-full px-4 sm:px-6 lg:px-8 py-8 text-center">
@@ -213,63 +222,55 @@ export default function ProfilePage() {
                 {/*</ProfileSection>*/}
 
                 <ProfileSection title="Preferences">
-                    {status === 'loading' ? (
-                        <div className="space-y-6 pt-1">
-                            <div className="flex justify-between items-center"><SkeletonLoader className="h-5 w-3/4" /><SkeletonLoader className="h-6 w-11 rounded-full" /></div>
-                            <div className="flex justify-between items-center"><SkeletonLoader className="h-5 w-3/4" /><SkeletonLoader className="h-6 w-11 rounded-full" /></div>
-                            <div className="flex justify-between items-center"><SkeletonLoader className="h-5 w-3/4" /><SkeletonLoader className="h-6 w-11 rounded-full" /></div>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-gray-900 dark:text-white font-medium">Email Notifications</p>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Receive updates about your links and account</p>
+                            </div>
+                            {updatingPreferences === 'emailNotifications'
+                                ? (
+                                    <Spinner />
+                                ) : (
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked={preferences.emailNotifications} onChange={() => handlePreferenceToggle('emailNotifications')} className="sr-only peer"/>
+                                        <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                    </label>
+                                )}
                         </div>
-                    ) : (
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-gray-900 dark:text-white font-medium">Email Notifications</p>
-                                    <p className="text-gray-500 dark:text-gray-400 text-sm">Receive updates about your links and account</p>
-                                </div>
-                                {updatingPreferences === 'emailNotifications'
-                                    ? (
-                                        <Spinner />
-                                    ) : (
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" checked={preferences.emailNotifications} onChange={() => handlePreferenceToggle('emailNotifications')} className="sr-only peer"/>
-                                            <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                                        </label>
-                                    )}
-                            </div>
 
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-gray-900 dark:text-white font-medium">Dark Mode Default</p>
-                                    <p className="text-gray-500 dark:text-gray-400 text-sm">Use dark mode by default when you log in</p>
-                                </div>
-                                {updatingPreferences === 'darkMode'
-                                    ? (
-                                        <Spinner />
-                                    ) : (
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" checked={preferences.darkMode} onChange={() => handlePreferenceToggle('darkMode')} className="sr-only peer"/>
-                                            <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
-                                        </label>
-                                    )}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-gray-900 dark:text-white font-medium">Dark Mode Default</p>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Use dark mode by default when you log in</p>
                             </div>
-
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-gray-900 dark:text-white font-medium">Link Analytics</p>
-                                    <p className="text-gray-500 dark:text-gray-400 text-sm">Track clicks and other metrics for your links</p>
-                                </div>
-                                {updatingPreferences === 'linkAnalytics'
-                                    ? (
-                                        <Spinner />
-                                    ) : (
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" checked={preferences.linkAnalytics} onChange={() => handlePreferenceToggle('linkAnalytics')} className="sr-only peer"/>
-                                            <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
-                                        </label>
-                                    )}
-                            </div>
+                            {updatingPreferences === 'darkMode'
+                                ? (
+                                    <Spinner />
+                                ) : (
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked={preferences.darkMode} onChange={() => handlePreferenceToggle('darkMode')} className="sr-only peer"/>
+                                        <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                    </label>
+                                )}
                         </div>
-                    )}
+
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-gray-900 dark:text-white font-medium">Link Analytics</p>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Track clicks and other metrics for your links</p>
+                            </div>
+                            {updatingPreferences === 'linkAnalytics'
+                                ? (
+                                    <Spinner />
+                                ) : (
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked={preferences.linkAnalytics} onChange={() => handlePreferenceToggle('linkAnalytics')} className="sr-only peer"/>
+                                        <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                    </label>
+                                )}
+                        </div>
+                    </div>
                 </ProfileSection>
 
                 <ProfileSection title="Remove Account">
