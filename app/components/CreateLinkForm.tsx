@@ -38,7 +38,7 @@ export default function CreateLinkForm({ onLinkCreatedAction }: CreateLinkFormPr
         <div className="w-full max-w-2xl">
             <form onSubmit={handleSubmit} className="relative grid items-center w-full">
                 <input
-                    type="url"
+                    type="text"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     className="w-full p-3 pr-12 border border-gray-800 dark:border-gray-600 rounded-2xl placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-gray-500 focus:border-transparent shadow-sm hover:shadow-md transition-colors transition-shadow duration-300 ease-in-out col-start-1 row-start-1 z-0"

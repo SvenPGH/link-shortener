@@ -194,23 +194,23 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-4">
-                <ProfileSection title="Subscription Type">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            {subscription.isPremium ? (
-                                <>
-                                    <PremiumIcon />
-                                    <span className="text-gray-900 dark:text-white font-medium">Premium Subscription</span>
-                                </>
-                            ) : (
-                                <span className="text-gray-900 dark:text-white font-medium">Free Plan</span>
-                            )}
-                        </div>
-                        <button onClick={handleSubscriptionToggle} className={`px-3 py-1.5 my-1 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 ${subscription.isPremium ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500' : 'bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-500'}`}>
-                            {subscription.isPremium ? 'Unsubscribe' : 'Subscribe'}
-                        </button>
-                    </div>
-                </ProfileSection>
+                {/*<ProfileSection title="Subscription Type">*/}
+                {/*    <div className="flex items-center justify-between">*/}
+                {/*        <div className="flex items-center space-x-2">*/}
+                {/*            {subscription.isPremium ? (*/}
+                {/*                <>*/}
+                {/*                    <PremiumIcon />*/}
+                {/*                    <span className="text-gray-900 dark:text-white font-medium">Premium Subscription</span>*/}
+                {/*                </>*/}
+                {/*            ) : (*/}
+                {/*                <span className="text-gray-900 dark:text-white font-medium">Free Plan</span>*/}
+                {/*            )}*/}
+                {/*        </div>*/}
+                {/*        <button onClick={handleSubscriptionToggle} className={`px-3 py-1.5 my-1 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 ${subscription.isPremium ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500' : 'bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-500'}`}>*/}
+                {/*            {subscription.isPremium ? 'Unsubscribe' : 'Subscribe'}*/}
+                {/*        </button>*/}
+                {/*    </div>*/}
+                {/*</ProfileSection>*/}
 
                 <ProfileSection title="Preferences">
                     {status === 'loading' ? (
