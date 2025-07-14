@@ -12,6 +12,15 @@ const nextConfig: NextConfig = {
                     },
                 ],
             },
+            {
+                source: '/api/user/:path*',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'no-store, max-age=0',
+                    },
+                ],
+            },
         ];
     },
     images: {

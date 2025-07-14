@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import {signOut, useSession} from 'next-auth/react';
 import Link from 'next/link';
 import UserIcon from "@/app/components/Icons/UserIcon";
 // import PremiumIcon from "@/app/components/Icons/PremiumIcon";
@@ -118,9 +118,16 @@ export default function ProfilePage() {
 
     // Mock handlers for future features
     // const handleSubscriptionToggle = () => setSubscription(prev => ({ ...prev, isPremium: !prev.isPremium }));
-    const handleRemoveAccount = () => {
-        if(window.confirm("Are you sure you want to remove your account? This action cannot be undone.")) {
-            alert("Account removal would be processed here (mock)");
+    const handleRemoveAccount = async () => {
+        if (window.confirm("Are you sure you want to remove your account? This action cannot be undone.")) {
+            const response = await fetch('/api/user', {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                await signOut({ callbackUrl: '/' });
+            } else {
+                alert('Failed to remove account. Please try again.');
+            }
         }
     };
 
