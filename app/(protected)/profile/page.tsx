@@ -104,7 +104,6 @@ export default function ProfilePage() {
 
         if (response.ok) {
             await update({
-                ...session,
                 user: {
                     ...session?.user,
                     [preference]: newValue,
