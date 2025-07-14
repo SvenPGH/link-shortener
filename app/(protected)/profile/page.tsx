@@ -93,13 +93,9 @@ export default function ProfilePage() {
     };
 
     const handlePreferenceToggle = async (preference: keyof typeof preferences) => {
-        if (updatingPreferences) return; // Disallow concurrent updates
+        if (updatingPreferences) return;
         setUpdatingPreferences(preference);
-
-        const currentValue = preferences[preference];
-        const newValue = !currentValue;
-
-        setPreferences(prev => ({ ...prev, [preference]: newValue }));
+        const newValue = !preferences[preference];
         const response = await fetch('/api/user/preferences', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -107,12 +103,17 @@ export default function ProfilePage() {
         });
 
         if (response.ok) {
-            await update({ [preference]: newValue });
+            await update({
+                ...session,
+                user: {
+                    ...session?.user,
+                    [preference]: newValue,
+                },
+            });
+            setPreferences(prev => ({ ...prev, [preference]: newValue }));
         } else {
             alert('Failed to update preference. Please try again.');
-            setPreferences(prev => ({ ...prev, [preference]: currentValue }));
         }
-
         setUpdatingPreferences(null);
     };
 

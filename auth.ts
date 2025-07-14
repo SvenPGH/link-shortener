@@ -16,21 +16,34 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
     ],
     callbacks: {
         ...authConfig.callbacks,
-        async jwt({ token, user }) {
-            if (user?.id) {
+        async jwt({ token, user, trigger, session }) {
+            if (user) {
                 const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
                 if (dbUser) {
                     token.id = dbUser.id;
+                    token.name = dbUser.name;
                     token.darkMode = dbUser.darkMode;
                     token.emailNotifications = dbUser.emailNotifications;
                     token.linkAnalytics = dbUser.linkAnalytics;
                 }
             }
+
+            if (trigger === "update" && session) {
+                 token.name = session.name;
+                 const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+                 if(dbUser) {
+                    token.darkMode = dbUser.darkMode;
+                    token.emailNotifications = dbUser.emailNotifications;
+                    token.linkAnalytics = dbUser.linkAnalytics;
+                 }
+            }
             return token;
         },
+
         async session({ session, token }) {
-            if (token.id && session.user) {
+            if (token) {
                 session.user.id = token.id as string;
+                session.user.name = token.name;
                 session.user.darkMode = token.darkMode as boolean;
                 session.user.emailNotifications = token.emailNotifications as boolean;
                 session.user.linkAnalytics = token.linkAnalytics as boolean;
