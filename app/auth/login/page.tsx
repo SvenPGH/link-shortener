@@ -7,6 +7,8 @@ import GoogleIcon from "@/app/components/Icons/GoogleIcon";
 // import GithubIcon from "@/app/components/Icons/GithubIcon";
 // import AppleIcon from "@/app/components/Icons/AppleIcon";
 
+export const dynamic = 'force-dynamic';
+
 export default function LoginPage() {
     const handleOAuthSignIn = (provider: string) => {
         signIn(provider, { callbackUrl: '/' });
