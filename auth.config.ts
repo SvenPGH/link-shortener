@@ -11,10 +11,7 @@ export const authConfig = {
             const { nextUrl } = request;
             const isProtectedRoute = nextUrl.pathname.startsWith('/my-links') || nextUrl.pathname.startsWith('/profile');
 
-            if (isProtectedRoute) {
-                if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to the login page
-            }
+            if (isProtectedRoute) return isLoggedIn;
             return true;
         },
     },
