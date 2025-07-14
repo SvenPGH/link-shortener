@@ -10,9 +10,6 @@ import GoogleIcon from "@/app/components/Icons/GoogleIcon";
 export const dynamic = 'force-dynamic';
 
 export default function LoginPage() {
-    const handleOAuthSignIn = (provider: string) => {
-        signIn(provider, { callbackUrl: '/' });
-    };
     const oauthButtonBaseStyle = "w-full flex items-center justify-center px-4 py-3 text-sm font-medium rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-300 ease-in-out";
     const oauthButtonStyle = `${oauthButtonBaseStyle} bg-gray-800 dark:bg-gray-200 text-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-300 focus:ring-gray-500 dark:focus:ring-gray-400 dark:focus:ring-offset-black`;
     return (
@@ -25,7 +22,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-4 mt-8">
-                    <button onClick={() => handleOAuthSignIn('google')} className={oauthButtonStyle}>
+                    <button onClick={() => signIn('google')} className={oauthButtonStyle}>
                         <GoogleIcon/>
                         Sign in with Google
                     </button>
