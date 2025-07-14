@@ -28,8 +28,16 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
                 }
             }
 
-            if (trigger === "update" && session) {
-                token = { ...token, ...session };
+            if (trigger === "update") {
+                const dbUser = await prisma.user.findUnique({
+                    where: { id: token.id as string }
+                });
+                if (dbUser) {
+                    token.name = dbUser.name;
+                    token.darkMode = dbUser.darkMode;
+                    token.emailNotifications = dbUser.emailNotifications;
+                    token.linkAnalytics = dbUser.linkAnalytics;
+                }
             }
             return token;
         },

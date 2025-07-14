@@ -77,13 +77,7 @@ export default function ProfilePage() {
             });
             if (response.ok) {
                 setSuccess('Profile updated successfully!');
-                await update({
-                ...session,
-                user: {
-                    ...session?.user,
-                    name: formData.name
-                }
-            });
+                await update();
             } else {
                 const data = await response.json();
                 setError(data.error || 'Failed to update profile.');
@@ -109,13 +103,7 @@ export default function ProfilePage() {
         });
 
         if (response.ok) {
-            await update({
-                ...session,
-                user: {
-                    ...session?.user,
-                    [preference]: newValue,
-                }
-            });
+            await update();
             setPreferences(prev => ({ ...prev, [preference]: newValue }));
         } else {
             alert('Failed to update preference. Please try again.');
