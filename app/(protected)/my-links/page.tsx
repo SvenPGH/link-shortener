@@ -127,10 +127,11 @@ export default function MyLinksPage() {
         setAllLinks(prevLinks => [newLink, ...prevLinks]);
     };
 
-    const customLinks = useMemo(() => allLinks.filter(link => link.isCustom), [allLinks]);
+    // const customLinks = useMemo(() => allLinks.filter(link => link.isCustom), [allLinks]);
     const standardLinks = useMemo(() => allLinks.filter(link => !link.isCustom), [allLinks]);
     const renderLinksContent = () => {
-        const linksToShow = activeTab === 'custom' ? customLinks : standardLinks;
+        // const linksToShow = activeTab === 'custom' ? customLinks : standardLinks;
+        const linksToShow = standardLinks;
         if (linksToShow.length === 0) {
             return <div className="mt-6 py-10 text-center"><p>You have no links in this category yet.</p></div>;
         }
@@ -186,11 +187,11 @@ export default function MyLinksPage() {
             </div>
             <div className="mb-1 border-b border-gray-300 dark:border-neutral-700">
                 <nav className="-mb-px grid grid-flow-col auto-cols-max gap-x-4 items-center" aria-label="Tabs">
-                    <button onClick={() => setActiveTab('custom')} className={getTabClassName('custom')} aria-current={activeTab === 'custom' ? 'page' : undefined}>
-                        <span>Custom Links</span>
-                            <PremiumIcon />
-                        <span>({customLinks.length})</span>
-                    </button>
+                    {/*<button onClick={() => setActiveTab('custom')} className={getTabClassName('custom')} aria-current={activeTab === 'custom' ? 'page' : undefined}>*/}
+                    {/*    <span>Custom Links</span>*/}
+                    {/*        <PremiumIcon />*/}
+                    {/*    <span>({customLinks.length})</span>*/}
+                    {/*</button>*/}
                     <button onClick={() => setActiveTab('standard')} className={getTabClassName('standard')} aria-current={activeTab === 'standard' ? 'page' : undefined}>
                         <span>Standard Links</span>
                         <span>({standardLinks.length})</span>
