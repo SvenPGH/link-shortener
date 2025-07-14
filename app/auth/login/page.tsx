@@ -22,7 +22,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-4 mt-8">
-                    <button onClick={() => signIn('google')} className={oauthButtonStyle}>
+                    <button onClick={() => signIn('google', { callbackUrl: '/', redirect: true })} className={oauthButtonStyle}>
                         <GoogleIcon/>
                         Sign in with Google
                     </button>
