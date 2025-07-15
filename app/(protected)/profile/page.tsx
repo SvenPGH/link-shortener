@@ -97,8 +97,6 @@ export default function ProfilePage() {
         setUpdatingPreferences(preference);
         const newValue = !preferences[preference];
 
-        console.log(`Updating ${preference} from ${preferences[preference]} to ${newValue}`);
-
         const response = await fetch('/api/user/preferences', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -106,28 +104,9 @@ export default function ProfilePage() {
         });
 
         if (response.ok) {
-            const updatedUser = await response.json();
-            console.log('API Response - Updated user:', updatedUser);
-
-            console.log('Session before update:', session);
-
-            // Try passing some data to trigger the update
-            const updatedSession = await update({
-                trigger: 'preference-update',
-                [preference]: newValue
-            });
-
-            console.log('Updated session from update():', updatedSession);
-
-            // Give React a moment to re-render with the new session
-            setTimeout(() => {
-                console.log('Session after timeout:', session);
-            }, 100);
-
-            // Update local state
+            await update();
             setPreferences(prev => ({ ...prev, [preference]: newValue }));
         } else {
-            console.error('Failed to update preference:', await response.text());
             alert('Failed to update preference. Please try again.');
         }
         setUpdatingPreferences(null);
