@@ -16,9 +16,10 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
     ],
     callbacks: {
         ...authConfig.callbacks,
-        async jwt({ token, user, trigger, session }) {
+        jwt: async ({ token, user, trigger, session }) => {
             console.log('JWT Callback - Trigger:', trigger);
             console.log('JWT Callback - Token ID:', token.id);
+            console.log('JWT Callback - Session data:', session);
 
             // Initial sign in - populate token with user data
             if (user) {
@@ -39,9 +40,7 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
                 }
             }
 
-            /**
-             * Trigger Database Fetch on Update to Update the Session with.
-             */
+            // Session update - fetch fresh data from database
             if (trigger === "update") {
                 console.log('JWT Callback - Session update triggered');
                 const dbUser = await prisma.user.findUnique({
@@ -74,7 +73,7 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
             return token;
         },
 
-        async session({ session, token }) {
+        session: async ({ session, token }) => {
             console.log('Session Callback - Token:', {
                 id: token.id,
                 name: token.name,
