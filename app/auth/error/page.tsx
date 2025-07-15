@@ -1,11 +1,11 @@
 'use client';
 
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
 
 type AuthError = 'InvalidCheck' | 'OAuthSignin' | 'OAuthCallback' | 'Configuration' | 'AccessDenied' | 'Verification' | string;
 
-function ErrorContent(): JSX.Element {
+function ErrorContent() {
     const searchParams = useSearchParams();
     const error = searchParams.get('error') as AuthError;
 
@@ -131,7 +131,7 @@ function ErrorContent(): JSX.Element {
     );
 }
 
-export default function AuthError(): JSX.Element {
+export default function AuthError() {
     return (
         <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">
