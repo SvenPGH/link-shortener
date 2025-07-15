@@ -1,144 +1,329 @@
 'use client';
 
-import React, { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import {signOut, useSession} from 'next-auth/react';
+import Link from 'next/link';
+import UserIcon from "@/app/components/Icons/UserIcon";
+// import PremiumIcon from "@/app/components/Icons/PremiumIcon";
+import Image from 'next/image';
 
-type AuthError = 'InvalidCheck' | 'OAuthSignin' | 'OAuthCallback' | 'Configuration' | 'AccessDenied' | 'Verification' | string;
-
-function ErrorContent() {
-    const searchParams = useSearchParams();
-    const error = searchParams.get('error') as AuthError;
-
-    const getErrorMessage = (error: AuthError): string => {
-        switch (error) {
-            case 'InvalidCheck':
-                return 'Authentication failed due to a security check. Please clear your browser cookies and try signing in again.';
-            case 'OAuthSignin':
-                return 'There was a problem with the OAuth provider. Please try again.';
-            case 'OAuthCallback':
-                return 'There was a problem processing your sign-in callback. Please try again.';
-            case 'Configuration':
-                return 'There is a problem with the server configuration. Please contact support.';
-            case 'AccessDenied':
-                return 'Access was denied. You may not have permission to sign in.';
-            case 'Verification':
-                return 'The verification token has expired or has already been used.';
-            default:
-                return 'An authentication error occurred. Please try again.';
-        }
-    };
-
-    const getErrorTitle = (error: AuthError): string => {
-        switch (error) {
-            case 'InvalidCheck':
-                return 'Security Check Failed';
-            case 'OAuthSignin':
-            case 'OAuthCallback':
-                return 'OAuth Error';
-            case 'Configuration':
-                return 'Server Configuration Error';
-            case 'AccessDenied':
-                return 'Access Denied';
-            case 'Verification':
-                return 'Verification Error';
-            default:
-                return 'Sign In Error';
-        }
-    };
-
-    const handleTryAgain = (): void => {
-        // Clear any auth-related localStorage/sessionStorage
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('nextauth.message');
-            sessionStorage.clear();
-        }
-        window.location.href = '/auth/signin';
-    };
-
-    const handleClearCookies = (): void => {
-        if (typeof window !== 'undefined') {
-            // Clear cookies for the current domain
-            document.cookie.split(";").forEach((c) => {
-                const eqPos = c.indexOf("=");
-                const name = eqPos > -1 ? c.substr(0, eqPos) : c;
-                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-            });
-        }
-        handleTryAgain();
-    };
-
+// The ProfileSection component is kept as requested for the layout.
+const ProfileSection = ({ title, children, className }: { title: string, children: React.ReactNode, className?: string }) => {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-                <div className="text-center mb-6">
-                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                        <svg
-                            className="h-6 w-6 text-red-600"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                            />
-                        </svg>
-                    </div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                        {getErrorTitle(error)}
-                    </h1>
-                    <p className="text-gray-600 text-sm mb-6">
-                        {getErrorMessage(error)}
-                    </p>
+        <div className={`bg-gray-50 dark:bg-neutral-800 rounded-xl shadow-lg border border-gray-200 dark:border-neutral-700 overflow-hidden ${className}`}>
+            <div className="p-3">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
+            </div>
+            <div>
+                <div className="p-4 pt-0 space-y-3">
+                    {children}
                 </div>
-
-                <div className="space-y-3">
-                    <button
-                        onClick={handleTryAgain}
-                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium"
-                    >
-                        Try Again
-                    </button>
-
-                    {error === 'InvalidCheck' && (
-                        <button
-                            onClick={handleClearCookies}
-                            className="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors duration-200 font-medium"
-                        >
-                            Clear Cookies & Try Again
-                        </button>
-                    )}
-
-                    <button
-                        onClick={() => window.location.href = '/'}
-                        className="w-full text-gray-500 py-2 px-4 rounded-md hover:text-gray-700 transition-colors duration-200"
-                    >
-                        Back to Home
-                    </button>
-                </div>
-
-                {process.env.NODE_ENV === 'development' && (
-                    <div className="mt-6 p-4 bg-gray-100 rounded-md">
-                        <p className="text-xs text-gray-500 font-mono">
-                            Debug Info: {error || 'No error code provided'}
-                        </p>
-                    </div>
-                )}
             </div>
         </div>
     );
-}
+};
 
-export default function AuthError() {
-    return (
-        <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+const Spinner = () => (
+    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900 dark:border-gray-100"></div>
+);
+
+const ProfileSkeleton = () => (
+    <div className="flex flex-col items-center text-center animate-pulse">
+        <div className="w-24 h-24 rounded-full bg-gray-300 dark:bg-gray-600 mb-2"></div>
+        <div className="mt-2">
+            <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-32 mb-2"></div>
+            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-40"></div>
+        </div>
+    </div>
+);
+
+const PreferencesSkeleton = () => (
+    <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center justify-between animate-pulse">
+                <div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32 mb-1"></div>
+                    <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-48"></div>
+                </div>
+                <div className="w-11 h-6 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
             </div>
-        }>
-            <ErrorContent />
-        </Suspense>
+        ))}
+    </div>
+);
+
+// Mock data for features that are not yet implemented, to preserve the UI
+// const mockSubscription = { isPremium: false };
+
+export default function ProfilePage() {
+    const { data: session, status, update } = useSession();
+    const [isEditing, setIsEditing] = useState(false);
+
+    const [formData, setFormData] = useState({ name: '' });
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+
+    // State for mock features
+    // const [subscription, setSubscription] = useState(mockSubscription);
+    const [preferences, setPreferences] = useState({
+        darkMode: false, emailNotifications: false, linkAnalytics: false,
+    });
+
+    const [isNameUpdating, setIsNameUpdating] = useState(false);
+    const [updatingPreferences, setUpdatingPreferences] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (session?.user?.name) {
+            setFormData({ name: session.user.name });
+            setPreferences({
+                darkMode: session.user.darkMode ?? false,
+                emailNotifications: session.user.emailNotifications ?? false,
+                linkAnalytics: session.user.linkAnalytics ?? false,
+            });
+        }
+    }, [session]);
+
+    const handleEditToggle = async () => {
+        if(isEditing) {
+            setError('');
+            setSuccess('');
+
+            if(formData.name === session?.user?.name) {
+                setIsEditing(false);
+                return;
+            }
+
+            setIsNameUpdating(true);
+            const response = await fetch('/api/user/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            if (response.ok) {
+                setSuccess('Profile updated successfully!');
+                await update({
+                    trigger: 'username-update'
+                });
+            } else {
+                const data = await response.json();
+                setError(data.error || 'Failed to update profile.');
+            }
+            setIsNameUpdating(false);
+        }
+        setIsEditing(!isEditing);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handlePreferenceToggle = async (preference: keyof typeof preferences) => {
+        if (updatingPreferences) return;
+        setUpdatingPreferences(preference);
+        const newValue = !preferences[preference];
+        const response = await fetch('/api/user/preferences', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ [preference]: newValue }),
+        });
+
+        if (response.ok) {
+            await update({
+                trigger: 'preference-update',
+                [preference]: newValue
+            });
+            setPreferences(prev => ({ ...prev, [preference]: newValue }));
+        } else {
+            console.error('Failed to update preference:', await response.text());
+            alert('Failed to update preference. Please try again.');
+        }
+        setUpdatingPreferences(null);
+    };
+
+    // Mock handlers for future features
+    // const handleSubscriptionToggle = () => setSubscription(prev => ({ ...prev, isPremium: !prev.isPremium }));
+    const handleRemoveAccount = async () => {
+        if (window.confirm("Are you sure you want to remove your account? This action cannot be undone.")) {
+            const response = await fetch('/api/user', {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                await signOut({ callbackUrl: '/' });
+            } else {
+                alert('Failed to remove account. Please try again.');
+            }
+        }
+    };
+
+    // Show unauthenticated state immediately if not authenticated
+    if (status === 'unauthenticated') {
+        return (
+            <div className="w-full px-4 sm:px-6 lg:px-8 py-8 text-center">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Profile</h1>
+                <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 mb-4">Please log in to view your profile.</p>
+                <Link href="/auth/login" className="inline-block px-6 py-3 text-sm font-medium rounded-2xl bg-gray-800 dark:bg-gray-200 text-white dark:text-black hover:bg-gray-700 dark:hover:bg-gray-300">
+                    Log In
+                </Link>
+            </div>
+        );
+    }
+
+    // Show the layout with loading states for individual sections
+    return (
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Profile Section */}
+            <div className={`md:row-span-2 bg-gray-50 dark:bg-neutral-800 rounded-xl shadow-lg border border-gray-200 dark:border-neutral-700 overflow-hidden self-start transition-opacity duration-300 ${isNameUpdating ? 'opacity-70' : 'opacity-100'}`}>
+                <div className="p-4">
+                    {status === 'loading' ? (
+                        <ProfileSkeleton />
+                    ) : session ? (
+                        isEditing ? (
+                            <div className="space-y-3">
+                                <div className="flex justify-center mb-4">
+                                    <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-indigo-500 dark:border-indigo-400 shadow-lg">
+                                        {session.user.image ? (
+                                            <Image src={session.user.image} alt={session.user.name || 'User Avatar'} width={96} height={96} />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-700 dark:bg-gray-200">
+                                                <UserIcon className="w-16 h-16 text-white dark:text-black" />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                                    <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-neutral-700 dark:text-white"/>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center text-center">
+                                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-indigo-500 dark:border-indigo-400 shadow-lg mb-2">
+                                    {session.user.image ? (
+                                        <Image src={session.user.image} alt={session.user.name || 'User Avatar'} width={96} height={96} />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-700 dark:bg-gray-200">
+                                            <UserIcon className="w-16 h-16 text-white dark:text-black" />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="mt-2">
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">{session.user.name}</h3>
+                                    <p className="text-gray-500 dark:text-gray-400">{session.user.email}</p>
+                                </div>
+                            </div>
+                        )
+                    ) : null}
+
+                    {/* Only show buttons if session is loaded */}
+                    {status !== 'loading' && session && (
+                        <div className="mt-4 flex justify-center">
+                            <button onClick={handleEditToggle} className="px-3 py-1.5 text-sm font-medium rounded-md bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-neutral-800 transition-colors duration-200">
+                                {isEditing ? 'Save Changes' : 'Edit Profile'}
+                            </button>
+                            {isEditing && (
+                                <button onClick={() => {setIsEditing(false); setFormData({ name: session.user.name || '' }); setError(''); setSuccess(''); }} className="ml-3 px-3 py-1.5 text-sm font-medium rounded-md bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-neutral-800 transition-colors duration-200">
+                                    Cancel
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    {error && <p className="text-center text-sm text-red-500 mt-4">{error}</p>}
+                    {success && <p className="text-center text-sm text-green-500 mt-4">{success}</p>}
+                </div>
+            </div>
+
+            {/* Right side sections */}
+            <div className="space-y-4">
+                {/*<ProfileSection title="Subscription Type">*/}
+                {/*    <div className="flex items-center justify-between">*/}
+                {/*        <div className="flex items-center space-x-2">*/}
+                {/*            {subscription.isPremium ? (*/}
+                {/*                <>*/}
+                {/*                    <PremiumIcon />*/}
+                {/*                    <span className="text-gray-900 dark:text-white font-medium">Premium Subscription</span>*/}
+                {/*                </>*/}
+                {/*            ) : (*/}
+                {/*                <span className="text-gray-900 dark:text-white font-medium">Free Plan</span>*/}
+                {/*            )}*/}
+                {/*        </div>*/}
+                {/*        <button onClick={handleSubscriptionToggle} className={`px-3 py-1.5 my-1 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 ${subscription.isPremium ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500' : 'bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-500'}`}>*/}
+                {/*            {subscription.isPremium ? 'Unsubscribe' : 'Subscribe'}*/}
+                {/*        </button>*/}
+                {/*    </div>*/}
+                {/*</ProfileSection>*/}
+
+                <ProfileSection title="Preferences">
+                    {status === 'loading' ? (
+                        <PreferencesSkeleton />
+                    ) : session ? (
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-gray-900 dark:text-white font-medium">Email Notifications</p>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm">Receive updates about your links and account</p>
+                                </div>
+                                {updatingPreferences === 'emailNotifications'
+                                    ? (
+                                        <Spinner />
+                                    ) : (
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" checked={preferences.emailNotifications} onChange={() => handlePreferenceToggle('emailNotifications')} className="sr-only peer"/>
+                                            <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                        </label>
+                                    )}
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-gray-900 dark:text-white font-medium">Dark Mode Default</p>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm">Use dark mode by default when you log in</p>
+                                </div>
+                                {updatingPreferences === 'darkMode'
+                                    ? (
+                                        <Spinner />
+                                    ) : (
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" checked={preferences.darkMode} onChange={() => handlePreferenceToggle('darkMode')} className="sr-only peer"/>
+                                            <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                        </label>
+                                    )}
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-gray-900 dark:text-white font-medium">Link Analytics</p>
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm">Track clicks and other metrics for your links</p>
+                                </div>
+                                {updatingPreferences === 'linkAnalytics'
+                                    ? (
+                                        <Spinner />
+                                    ) : (
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" checked={preferences.linkAnalytics} onChange={() => handlePreferenceToggle('linkAnalytics')} className="sr-only peer"/>
+                                            <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                        </label>
+                                    )}
+                            </div>
+                        </div>
+                    ) : null}
+                </ProfileSection>
+
+                <ProfileSection title="Remove Account">
+                    <div>
+                        <p className="text-gray-700 dark:text-gray-300 mb-3">
+                            Permanently delete your account and all associated data. This action cannot be undone.
+                        </p>
+                        <button
+                            onClick={handleRemoveAccount}
+                            disabled={status === 'loading' || !session}
+                            className="px-3 py-1.5 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Remove Account
+                        </button>
+                    </div>
+                </ProfileSection>
+            </div>
+        </div>
     );
 }
