@@ -16,9 +16,8 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
     ],
     callbacks: {
         ...authConfig.callbacks,
-
-        jwt: async ({ token, user, trigger, session }) => {
-            // Initial sign in | populate token with user data
+        jwt: async ({ token, user, trigger }) => {
+            // Initial sign in - populate token with user data
             if (user) {
                 const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
                 if (dbUser) {
@@ -30,7 +29,7 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
                 }
             }
 
-            // Session update | fetch fresh data from database
+            // Session update - fetch fresh data from database
             if (trigger === "update") {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string }
@@ -42,7 +41,6 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
                     token.linkAnalytics = dbUser.linkAnalytics;
                 }
             }
-
             return token;
         },
 

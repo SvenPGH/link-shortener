@@ -77,7 +77,9 @@ export default function ProfilePage() {
             });
             if (response.ok) {
                 setSuccess('Profile updated successfully!');
-                await update();
+                await update({
+                    trigger: 'username-update'
+                });
             } else {
                 const data = await response.json();
                 setError(data.error || 'Failed to update profile.');
@@ -96,7 +98,6 @@ export default function ProfilePage() {
         if (updatingPreferences) return;
         setUpdatingPreferences(preference);
         const newValue = !preferences[preference];
-
         const response = await fetch('/api/user/preferences', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -104,9 +105,13 @@ export default function ProfilePage() {
         });
 
         if (response.ok) {
-            await update();
+            await update({
+                trigger: 'preference-update',
+                [preference]: newValue
+            });
             setPreferences(prev => ({ ...prev, [preference]: newValue }));
         } else {
+            console.error('Failed to update preference:', await response.text());
             alert('Failed to update preference. Please try again.');
         }
         setUpdatingPreferences(null);
