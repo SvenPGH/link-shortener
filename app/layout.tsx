@@ -5,6 +5,8 @@ import Header from '@/app/components/Header/Header';
 import Footer from '@/app/components/Footer/Footer';
 import Providers from "@/app/providers";
 
+import { Analytics } from "@vercel/analytics/next"
+
 import { Jura } from 'next/font/google';
 import {ThemeProvider} from "@/app/contexts/ThemeContext";
 
@@ -98,6 +100,7 @@ export default function RootLayout({children,}: Readonly<{ children: React.React
                         </div>
                     </ThemeProvider>
                 </Providers>
+                <Analytics/>
             </body>
         </html>
     );

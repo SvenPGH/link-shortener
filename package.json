@@ -22,8 +22,8 @@
     "ws": "^8.18.3",
     "path-to-regexp": "^8.2.0",
     "esbuild": "~0.25.6",
-    "undici": "5.29.0"
-
+    "undici": "5.29.0",
+    "@vercel/analytics": "^1.5.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
