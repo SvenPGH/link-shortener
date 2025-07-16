@@ -27,7 +27,7 @@ export default function CombinedPrivacyPage() {
                 <h2 className="text-xl font-bold mt-6">3. Bereitstellung der Website und Erstellung von Logfiles
                     (Hosting bei Vercel)</h2>
                 <p className="mt-2">
-                    Unsere Website wird von Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA ("Vercel")
+                    Unsere Website wird von Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA (\"Vercel\")
                     gehostet.
                 </p>
                 <p className="mt-2">
@@ -136,7 +136,7 @@ export default function CombinedPrivacyPage() {
                 <ul className="mt-2 ml-6 list-disc">
                     <li>Auskunftsrecht (Art. 15 DSGVO)</li>
                     <li>Recht auf Berichtigung (Art. 16 DSGVO)</li>
-                    <li>Recht auf Löschung ("Recht auf Vergessenwerden") (Art. 17 DSGVO)</li>
+                    <li>Recht auf Löschung (\"Recht auf Vergessenwerden\") (Art. 17 DSGVO)</li>
                     <li>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
                     <li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO)</li>
                     <li>Widerspruchsrecht (Art. 21 DSGVO)</li>
@@ -164,7 +164,7 @@ export default function CombinedPrivacyPage() {
 
                 <h2 className="text-xl font-bold mt-6">2. Data Controller</h2>
                 <p className="mt-2">
-                    The party responsible for the collection and processing of data on this website (the "controller")
+                    The party responsible for the collection and processing of data on this website (the \"controller\")
                     is:
                 </p>
                 <div className="mt-2 pl-4 border-l-2 border-gray-300">
@@ -177,7 +177,7 @@ export default function CombinedPrivacyPage() {
                 <h2 className="text-xl font-bold mt-6">3. Data Processing When Visiting Our Website (Vercel
                     Hosting)</h2>
                 <p className="mt-2">
-                    Our website is hosted by Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA ("Vercel").
+                    Our website is hosted by Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA (\"Vercel\").
                 </p>
                 <p className="mt-2">
                     When you visit our website, Vercel automatically collects and stores information in server log
@@ -202,7 +202,7 @@ export default function CombinedPrivacyPage() {
                 </p>
                 <p className="mt-2">
                     To ensure an adequate level of data protection, we have entered into a Data Processing Agreement
-                    (DPA) with Vercel. This agreement incorporates the EU's Standard Contractual Clauses (SCCs). These
+                    (DPA) with Vercel. This agreement incorporates the EU\'s Standard Contractual Clauses (SCCs). These
                     clauses are a mechanism approved by the European Commission to ensure that your personal data is
                     protected to a standard equivalent to that of the GDPR when transferred outside the EU.
                 </p>
@@ -281,7 +281,7 @@ export default function CombinedPrivacyPage() {
                 <ul className="mt-2 ml-6 list-disc">
                     <li>Right of access (Art. 15 GDPR)</li>
                     <li>Right to rectification (Art. 16 GDPR)</li>
-                    <li>Right to erasure ("right to be forgotten") (Art. 17 GDPR)</li>
+                    <li>Right to erasure (\"right to be forgotten\") (Art. 17 GDPR)</li>
                     <li>Right to restriction of processing (Art. 18 GDPR)</li>
                     <li>Right to data portability (Art. 20 GDPR)</li>
                     <li>Right to object (Art. 21 GDPR)</li>
