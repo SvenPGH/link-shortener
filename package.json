@@ -19,7 +19,11 @@
     "next-auth": "5.0.0-beta.29",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "path-to-regexp": "^8.2.0",
+    "esbuild": "~0.25.6",
+    "undici": "5.29.0"
+
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
