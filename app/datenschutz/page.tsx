@@ -2,8 +2,8 @@ export default function CombinedPrivacyPage() {
     return (
         <div className="w-full max-w-4xl mx-auto py-8 px-4 prose dark:prose-invert">
             {/* German Section */}
-            <section className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-sm">
-                <h1 className="text-3xl font-bold mb-6">Datenschutzerklärung</h1>
+            <section>
+                <h1>Datenschutzerklärung</h1>
                 <p className="text-sm text-gray-600 mb-8">Stand: 16. Juli 2025</p>
 
                 <h2 className="text-xl font-bold mt-6">1. Einleitung</h2>
@@ -148,11 +148,11 @@ export default function CombinedPrivacyPage() {
                 </p>
             </section>
 
-            <hr className="my-12"/>
+            <hr className="my-12" />
 
             {/* English Section */}
-            <section className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-sm">
-                <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
+            <section>
+                <h1>Privacy Policy</h1>
                 <p className="text-sm text-gray-600 mb-8">Last Updated: July 16, 2025</p>
 
                 <h2 className="text-xl font-bold mt-6">1. Introduction</h2>
