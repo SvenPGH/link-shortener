@@ -1,1 +1,1 @@
-Link Shortener by Sven Puite
+Link Shortener
